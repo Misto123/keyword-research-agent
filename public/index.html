@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keyword Research Agent</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #0f1419;
+      color: #e7e9ea;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: #16181c;
+      border-bottom: 1px solid #2f3336;
+      padding: 20px 0;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1d9bf0;
+    }
+
+    .subtitle {
+      color: #71767b;
+      margin-top: 5px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #2f3336;
+    }
+
+    .tab {
+      padding: 15px 25px;
+      background: none;
+      border: none;
+      color: #71767b;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: #e7e9ea;
+    }
+
+    .tab.active {
+      color: #1d9bf0;
+      border-bottom-color: #1d9bf0;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: #16181c;
+      border: 1px solid #2f3336;
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #e7e9ea;
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0f1419;
+      border: 1px solid #2f3336;
+      border-radius: 8px;
+      color: #e7e9ea;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #1d9bf0;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #1d9bf0;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #1a8cd8;
+    }
+
+    .btn-secondary {
+      background: #16181c;
+      color: #e7e9ea;
+      border: 1px solid #2f3336;
+    }
+
+    .btn-secondary:hover {
+      background: #1c1f23;
+    }
+
+    .btn-danger {
+      background: #f4212e;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #dc1928;
+    }
+
+    .job-item {
+      background: #16181c;
+      border: 1px solid #2f3336;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .job-item:hover {
+      border-color: #1d9bf0;
+      background: #1a1d23;
+    }
+
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .job-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #e7e9ea;
+    }
+
+    .job-status {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .status-queued {
+      background: #2f3336;
+      color: #71767b;
+    }
+
+    .status-running {
+      background: #1d4ed8;
+      color: #93c5fd;
+    }
+
+    .status-completed {
+      background: #166534;
+      color: #86efac;
+    }
+
+    .status-failed {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+
+    .job-meta {
+      display: flex;
+      gap: 20px;
+      color: #71767b;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #2f3336;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #1d9bf0;
+      transition: width 0.3s;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: #16181c;
+      border: 1px solid #2f3336;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1d9bf0;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: #71767b;
+      font-size: 14px;
+    }
+
+    .article-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 15px;
+    }
+
+    .article-card {
+      background: #16181c;
+      border: 1px solid #2f3336;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .article-card:hover {
+      border-color: #1d9bf0;
+    }
+
+    .article-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e7e9ea;
+      margin-bottom: 10px;
+    }
+
+    .article-keyword {
+      color: #1d9bf0;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #71767b;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: #16181c;
+      border-radius: 16px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #71767b;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .close-btn:hover {
+      background: #2f3336;
+    }
+
+    .article-content {
+      margin-top: 20px;
+      line-height: 1.8;
+    }
+
+    .article-content h2 {
+      margin-top: 30px;
+      margin-bottom: 15px;
+      color: #e7e9ea;
+    }
+
+    .article-content p {
+      margin-bottom: 15px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #71767b;
+    }
+
+    .spinner {
+      border: 3px solid #2f3336;
+      border-top-color: #1d9bf0;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .article-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>🔬 Keyword Research Agent</h1>
+      <p class="subtitle">AI-powered keyword research and content generation</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" data-tab="new-research">New Research</button>
+      <button class="tab" data-tab="jobs">Research Jobs</button>
+      <button class="tab" data-tab="settings">Settings</button>
+      <button class="tab" data-tab="admin">Admin</button>
+    </div>
+
+    <!-- New Research Tab -->
+    <div class="tab-content active" id="new-research">
+      <div class="card">
+        <h2 style="margin-bottom: 20px;">Start New Research</h2>
+        <form id="research-form">
+          <div class="form-group">
+            <label for="niche">Niche / Topic *</label>
+            <input 
+              type="text" 
+              id="niche" 
+              placeholder="e.g., organic dog food, natural soap, keto diet"
+              required
+            >
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="country">Country</label>
+              <select id="country">
+                <option value="US">United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="ES">Spain</option>
+                <option value="IT">Italy</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="language">Language</label>
+              <select id="language">
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="it">Italian</option>
+                <option value="pt">Portuguese</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="depth">Research Depth</label>
+              <select id="depth">
+                <option value="quick">Quick (~5 min, $1-2, ~10 articles)</option>
+                <option value="standard" selected>Standard (~15 min, $3-5, ~30 articles)</option>
+                <option value="exhaustive">Exhaustive (~45 min, $10-20, ~100 articles)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="autoPublish" style="width: auto; margin-right: 8px;">
+                Auto-publish to WordPress/API
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+            Start Research
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Jobs Tab -->
+    <div class="tab-content" id="jobs">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Research Jobs</h2>
+          <button class="btn btn-secondary" onclick="loadJobs()">🔄 Refresh</button>
+        </div>
+        <div id="jobs-list">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading jobs...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="settings">
+      <div class="card">
+        <h2 style="margin-bottom: 20px;">API Configuration Status</h2>
+        <p style="color: #71767b; margin-bottom: 20px;">
+          View your API configuration status. To update settings, go to the Admin tab.
+        </p>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">DataForSEO</div>
+            <div class="stat-value" style="font-size: 20px;" id="dataforseo-status">⚠️</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Serper.dev</div>
+            <div class="stat-value" style="font-size: 20px;" id="serper-status">⚠️</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">llmsrelay</div>
+            <div class="stat-value" style="font-size: 20px;" id="llmsrelay-status">⚠️</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">OpenAI</div>
+            <div class="stat-value" style="font-size: 20px;" id="openai-status">⚠️</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Tab -->
+    <div class="tab-content" id="admin">
+      <div class="card">
+        <h2 style="margin-bottom: 20px;">🔧 Admin Settings</h2>
+        <p style="color: #71767b; margin-bottom: 30px;">
+          Configure your API keys. Settings are saved securely on the server.
+        </p>
+
+        <!-- llmsrelay Section -->
+        <div style="margin-bottom: 30px;">
+          <h3 style="color: #1d9bf0; margin-bottom: 15px;">llmsrelay (AI Provider)</h3>
+          <div class="form-group">
+            <label for="llmsrelay-key">API Key *</label>
+            <input type="password" id="llmsrelay-key" placeholder="your_llmsrelay_api_key">
+          </div>
+          <div class="form-group">
+            <label for="llmsrelay-url">Base URL</label>
+            <input type="text" id="llmsrelay-url" value="https://api.llmsrelay.com/v1">
+          </div>
+          <button class="btn btn-secondary" onclick="testConnection('llmsrelay')">🔌 Test Connection</button>
+        </div>
+
+        <hr style="border: 1px solid #2f3336; margin: 30px 0;">
+
+        <!-- Keyword Research Section -->
+        <div style="margin-bottom: 30px;">
+          <h3 style="color: #1d9bf0; margin-bottom: 15px;">Keyword Research (Choose One)</h3>
+          
+          <div style="margin-bottom: 20px;">
+            <h4 style="color: #e7e9ea; margin-bottom: 10px;">DataForSEO</h4>
+            <div class="form-group">
+              <label for="dataforseo-login">Login (Email)</label>
+              <input type="email" id="dataforseo-login" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+              <label for="dataforseo-password">Password</label>
+              <input type="password" id="dataforseo-password" placeholder="your_password">
+            </div>
+            <button class="btn btn-secondary" onclick="testConnection('dataforseo')">🔌 Test Connection</button>
+          </div>
+
+          <p style="text-align: center; color: #71767b; margin: 20px 0;">OR</p>
+
+          <div>
+            <h4 style="color: #e7e9ea; margin-bottom: 10px;">Serper.dev</h4>
+            <div class="form-group">
+              <label for="serper-key">API Key</label>
+              <input type="password" id="serper-key" placeholder="your_serper_api_key">
+            </div>
+            <button class="btn btn-secondary" onclick="testConnection('serper')">🔌 Test Connection</button>
+          </div>
+        </div>
+
+        <hr style="border: 1px solid #2f3336; margin: 30px 0;">
+
+        <!-- Optional Settings -->
+        <details style="margin-bottom: 20px;">
+          <summary style="cursor: pointer; color: #1d9bf0; margin-bottom: 15px; font-weight: 600;">
+            Optional: Alternative AI Providers
+          </summary>
+          
+          <div style="margin: 15px 0;">
+            <h4 style="color: #e7e9ea; margin-bottom: 10px;">OpenAI</h4>
+            <div class="form-group">
+              <label for="openai-key">API Key</label>
+              <input type="password" id="openai-key" placeholder="sk-...">
+            </div>
+          </div>
+
+          <div style="margin: 15px 0;">
+            <h4 style="color: #e7e9ea; margin-bottom: 10px;">DeepSeek</h4>
+            <div class="form-group">
+              <label for="deepseek-key">API Key</label>
+              <input type="password" id="deepseek-key" placeholder="your_deepseek_key">
+            </div>
+          </div>
+        </details>
+
+        <details style="margin-bottom: 20px;">
+          <summary style="cursor: pointer; color: #1d9bf0; margin-bottom: 15px; font-weight: 600;">
+            Optional: Publishing Settings
+          </summary>
+
+          <div style="margin: 15px 0;">
+            <h4 style="color: #e7e9ea; margin-bottom: 10px;">WordPress</h4>
+            <div class="form-group">
+              <label for="wordpress-url">Site URL</label>
+              <input type="url" id="wordpress-url" placeholder="https://yoursite.com/wp-json/wp/v2">
+            </div>
+            <div class="form-group">
+              <label for="wordpress-token">API Token</label>
+              <input type="password" id="wordpress-token" placeholder="your_application_password">
+            </div>
+          </div>
+
+          <div style="margin: 15px 0;">
+            <h4 style="color: #e7e9ea; margin-bottom: 10px;">Custom API</h4>
+            <div class="form-group">
+              <label for="custom-url">API URL</label>
+              <input type="url" id="custom-url" placeholder="https://your-api.com/articles">
+            </div>
+            <div class="form-group">
+              <label for="custom-key">API Key</label>
+              <input type="password" id="custom-key" placeholder="your_api_key">
+            </div>
+          </div>
+        </details>
+
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+          <button class="btn btn-primary" onclick="saveSettings()">💾 Save All Settings</button>
+          <button class="btn btn-secondary" onclick="loadSettings()">🔄 Reload Settings</button>
+        </div>
+
+        <div id="settings-message" style="margin-top: 15px; padding: 12px; border-radius: 8px; display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Article Modal -->
+  <div class="modal" id="article-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Article</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
