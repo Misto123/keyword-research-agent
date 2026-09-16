@@ -365,23 +365,38 @@ async function loadSettings() {
 function updateStatusIndicators(settings) {
   // DataForSEO
   const dfStatus = document.getElementById('dataforseo-status');
-  if (settings.dataforseo?.login && settings.dataforseo?.password) {
-    dfStatus.textContent = '✅';
-    dfStatus.style.color = '#86efac';
+  if (dfStatus) {
+    if (settings.dataforseo?.login && settings.dataforseo?.password) {
+      dfStatus.textContent = '✅';
+      dfStatus.style.color = '#10b981';
+    } else {
+      dfStatus.textContent = '⚠️';
+      dfStatus.style.color = '#f59e0b';
+    }
   }
   
   // Serper
   const serperStatus = document.getElementById('serper-status');
-  if (settings.serper?.apiKey) {
-    serperStatus.textContent = '✅';
-    serperStatus.style.color = '#86efac';
+  if (serperStatus) {
+    if (settings.serper?.apiKey) {
+      serperStatus.textContent = '✅';
+      serperStatus.style.color = '#10b981';
+    } else {
+      serperStatus.textContent = '⚠️';
+      serperStatus.style.color = '#f59e0b';
+    }
   }
   
   // llmsrelay
   const llmsrelayStatus = document.getElementById('llmsrelay-status');
-  if (settings.llmsrelay?.apiKey) {
-    llmsrelayStatus.textContent = '✅';
-    llmsrelayStatus.style.color = '#86efac';
+  if (llmsrelayStatus) {
+    if (settings.llmsrelay?.apiKey) {
+      llmsrelayStatus.textContent = '✅';
+      llmsrelayStatus.style.color = '#10b981';
+    } else {
+      llmsrelayStatus.textContent = '⚠️';
+      llmsrelayStatus.style.color = '#f59e0b';
+    }
   }
 }
 
@@ -404,12 +419,12 @@ async function saveSettings() {
       baseUrl: document.getElementById('llmsrelay-url').value
     },
     wordpress: {
-      url: document.getElementById('wordpress-url').value,
-      token: document.getElementById('wordpress-token').value
+      url: document.getElementById('wordpress-url')?.value || '',
+      token: document.getElementById('wordpress-token')?.value || ''
     },
     customApi: {
-      url: document.getElementById('custom-url').value,
-      key: document.getElementById('custom-key').value
+      url: document.getElementById('custom-url')?.value || '',
+      key: document.getElementById('custom-key')?.value || ''
     }
   };
   
@@ -425,13 +440,13 @@ async function saveSettings() {
     const result = await res.json();
     
     if (res.ok) {
-      showSettingsMessage('✅ Settings saved successfully!', 'success');
+      showMessage('✅ Settings saved successfully!', 'success');
       updateStatusIndicators(settings);
     } else {
-      showSettingsMessage(`❌ Error: ${result.error}`, 'error');
+      showMessage(`❌ Error: ${result.error}`, 'error');
     }
   } catch (error) {
-    showSettingsMessage(`❌ Error: ${error.message}`, 'error');
+    showMessage(`❌ Error: ${error.message}`, 'error');
   } finally {
     btn.textContent = originalText;
     btn.disabled = false;

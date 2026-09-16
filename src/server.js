@@ -282,8 +282,21 @@ async function runResearch(jobId, researchConfig) {
   } catch (error) {
     job.status = 'failed';
     job.error = error.message;
-    job.failedAt = new Date().toISOString();
+    job.errorStack = error.stack;
+    job.errorDetails = {
+      message: error.message,
+      name: error.name,
+      timestamp: new Date().toISOString()
+    };
+    job.completedAt = new Date().toISOString();
+    console.error('❌ Research job failed:', {
+      jobId,
+      error: error.message,
+      stack: error.stack,
+      config: researchConfig
+    });
   }
+}
 }
 
 // Health check
