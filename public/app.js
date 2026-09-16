@@ -332,21 +332,21 @@ async function loadSettings() {
     const res = await fetch(`${API_URL}/settings`);
     const settings = await res.json();
     
-    // Populate form fields
-    if (settings.dataforseo?.login) {
+    // Populate form fields (check if element exists first)
+    if (settings.dataforseo?.login && document.getElementById('dataforseo-login')) {
       document.getElementById('dataforseo-login').value = settings.dataforseo.login;
     }
-    if (settings.serper?.apiKey) {
+    if (settings.serper?.apiKey && document.getElementById('serper-key')) {
       document.getElementById('serper-key').value = settings.serper.apiKey;
     }
-    if (settings.llmsrelay?.apiKey) {
+    if (settings.llmsrelay?.apiKey && document.getElementById('llmsrelay-key')) {
       document.getElementById('llmsrelay-key').value = settings.llmsrelay.apiKey;
       document.getElementById('llmsrelay-url').value = settings.llmsrelay.baseUrl || 'https://api.llmsrelay.com/v1';
     }
-    if (settings.wordpress?.url) {
+    if (settings.wordpress?.url && document.getElementById('wordpress-url')) {
       document.getElementById('wordpress-url').value = settings.wordpress.url;
     }
-    if (settings.customApi?.url) {
+    if (settings.customApi?.url && document.getElementById('custom-url')) {
       document.getElementById('custom-url').value = settings.customApi.url;
     }
     
