@@ -150,6 +150,32 @@
       background: #dc1928;
     }
 
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #71767b;
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 18px;
+      transition: color 0.2s;
+    }
+
+    .password-toggle:hover {
+      color: #1d9bf0;
+    }
+
+    .password-wrapper input {
+      padding-right: 45px;
+    }
+
     .job-item {
       background: #16181c;
       border: 1px solid #2f3336;
@@ -423,7 +449,6 @@
       <button class="tab active" data-tab="new-research">New Research</button>
       <button class="tab" data-tab="jobs">Research Jobs</button>
       <button class="tab" data-tab="settings">Settings</button>
-      <button class="tab" data-tab="admin">Admin</button>
     </div>
 
     <!-- New Research Tab -->
@@ -513,12 +538,14 @@
     <!-- Settings Tab -->
     <div class="tab-content" id="settings">
       <div class="card">
-        <h2 style="margin-bottom: 20px;">API Configuration Status</h2>
-        <p style="color: #71767b; margin-bottom: 20px;">
-          View your API configuration status. To update settings, go to the Admin tab.
-        </p>
+        <h2 style="margin-bottom: 20px;">⚙️ Settings</h2>
         
-        <div class="stats-grid">
+        <!-- Status Overview -->
+        <div class="stats-grid" style="margin-bottom: 30px;">
+          <div class="stat-card">
+            <div class="stat-label">llmsrelay</div>
+            <div class="stat-value" style="font-size: 20px;" id="llmsrelay-status">⚠️</div>
+          </div>
           <div class="stat-card">
             <div class="stat-label">DataForSEO</div>
             <div class="stat-value" style="font-size: 20px;" id="dataforseo-status">⚠️</div>
@@ -527,32 +554,21 @@
             <div class="stat-label">Serper.dev</div>
             <div class="stat-value" style="font-size: 20px;" id="serper-status">⚠️</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">llmsrelay</div>
-            <div class="stat-value" style="font-size: 20px;" id="llmsrelay-status">⚠️</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">OpenAI</div>
-            <div class="stat-value" style="font-size: 20px;" id="openai-status">⚠️</div>
-          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Admin Tab -->
-    <div class="tab-content" id="admin">
-      <div class="card">
-        <h2 style="margin-bottom: 20px;">🔧 Admin Settings</h2>
         <p style="color: #71767b; margin-bottom: 30px;">
-          Configure your API keys. Settings are saved securely on the server.
+          Configure your API keys below. Settings are saved securely on the server.
         </p>
 
         <!-- llmsrelay Section -->
         <div style="margin-bottom: 30px;">
-          <h3 style="color: #1d9bf0; margin-bottom: 15px;">llmsrelay (AI Provider)</h3>
+          <h3 style="color: #1d9bf0; margin-bottom: 15px;">llmsrelay (AI Provider) *</h3>
           <div class="form-group">
             <label for="llmsrelay-key">API Key *</label>
-            <input type="password" id="llmsrelay-key" placeholder="your_llmsrelay_api_key">
+            <div class="password-wrapper">
+              <input type="password" id="llmsrelay-key" placeholder="your_llmsrelay_api_key">
+              <button class="password-toggle" onclick="togglePassword('llmsrelay-key')" type="button">👁️</button>
+            </div>
           </div>
           <div class="form-group">
             <label for="llmsrelay-url">Base URL</label>
@@ -565,7 +581,7 @@
 
         <!-- Keyword Research Section -->
         <div style="margin-bottom: 30px;">
-          <h3 style="color: #1d9bf0; margin-bottom: 15px;">Keyword Research (Choose One)</h3>
+          <h3 style="color: #1d9bf0; margin-bottom: 15px;">Keyword Research (Choose One) *</h3>
           
           <div style="margin-bottom: 20px;">
             <h4 style="color: #e7e9ea; margin-bottom: 10px;">DataForSEO</h4>
@@ -575,7 +591,10 @@
             </div>
             <div class="form-group">
               <label for="dataforseo-password">Password</label>
-              <input type="password" id="dataforseo-password" placeholder="your_password">
+              <div class="password-wrapper">
+                <input type="password" id="dataforseo-password" placeholder="your_password">
+                <button class="password-toggle" onclick="togglePassword('dataforseo-password')" type="button">👁️</button>
+              </div>
             </div>
             <button class="btn btn-secondary" onclick="testConnection('dataforseo')">🔌 Test Connection</button>
           </div>
@@ -586,7 +605,10 @@
             <h4 style="color: #e7e9ea; margin-bottom: 10px;">Serper.dev</h4>
             <div class="form-group">
               <label for="serper-key">API Key</label>
-              <input type="password" id="serper-key" placeholder="your_serper_api_key">
+              <div class="password-wrapper">
+                <input type="password" id="serper-key" placeholder="your_serper_api_key">
+                <button class="password-toggle" onclick="togglePassword('serper-key')" type="button">👁️</button>
+              </div>
             </div>
             <button class="btn btn-secondary" onclick="testConnection('serper')">🔌 Test Connection</button>
           </div>
@@ -595,28 +617,6 @@
         <hr style="border: 1px solid #2f3336; margin: 30px 0;">
 
         <!-- Optional Settings -->
-        <details style="margin-bottom: 20px;">
-          <summary style="cursor: pointer; color: #1d9bf0; margin-bottom: 15px; font-weight: 600;">
-            Optional: Alternative AI Providers
-          </summary>
-          
-          <div style="margin: 15px 0;">
-            <h4 style="color: #e7e9ea; margin-bottom: 10px;">OpenAI</h4>
-            <div class="form-group">
-              <label for="openai-key">API Key</label>
-              <input type="password" id="openai-key" placeholder="sk-...">
-            </div>
-          </div>
-
-          <div style="margin: 15px 0;">
-            <h4 style="color: #e7e9ea; margin-bottom: 10px;">DeepSeek</h4>
-            <div class="form-group">
-              <label for="deepseek-key">API Key</label>
-              <input type="password" id="deepseek-key" placeholder="your_deepseek_key">
-            </div>
-          </div>
-        </details>
-
         <details style="margin-bottom: 20px;">
           <summary style="cursor: pointer; color: #1d9bf0; margin-bottom: 15px; font-weight: 600;">
             Optional: Publishing Settings
@@ -630,7 +630,10 @@
             </div>
             <div class="form-group">
               <label for="wordpress-token">API Token</label>
-              <input type="password" id="wordpress-token" placeholder="your_application_password">
+              <div class="password-wrapper">
+                <input type="password" id="wordpress-token" placeholder="your_application_password">
+                <button class="password-toggle" onclick="togglePassword('wordpress-token')" type="button">👁️</button>
+              </div>
             </div>
           </div>
 
@@ -642,7 +645,10 @@
             </div>
             <div class="form-group">
               <label for="custom-key">API Key</label>
-              <input type="password" id="custom-key" placeholder="your_api_key">
+              <div class="password-wrapper">
+                <input type="password" id="custom-key" placeholder="your_api_key">
+                <button class="password-toggle" onclick="togglePassword('custom-key')" type="button">👁️</button>
+              </div>
             </div>
           </div>
         </details>

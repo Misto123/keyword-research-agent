@@ -311,6 +311,20 @@ document.getElementById('article-modal').addEventListener('click', (e) => {
 loadJobs();
 loadSettings();
 
+// Password Toggle Function
+function togglePassword(fieldId) {
+  const field = document.getElementById(fieldId);
+  const button = event.target;
+  
+  if (field.type === 'password') {
+    field.type = 'text';
+    button.textContent = '🙈';
+  } else {
+    field.type = 'password';
+    button.textContent = '👁️';
+  }
+}
+
 // Settings Management Functions
 
 async function loadSettings() {
@@ -328,12 +342,6 @@ async function loadSettings() {
     if (settings.llmsrelay?.apiKey) {
       document.getElementById('llmsrelay-key').value = settings.llmsrelay.apiKey;
       document.getElementById('llmsrelay-url').value = settings.llmsrelay.baseUrl || 'https://api.llmsrelay.com/v1';
-    }
-    if (settings.openai?.apiKey) {
-      document.getElementById('openai-key').value = settings.openai.apiKey;
-    }
-    if (settings.deepseek?.apiKey) {
-      document.getElementById('deepseek-key').value = settings.deepseek.apiKey;
     }
     if (settings.wordpress?.url) {
       document.getElementById('wordpress-url').value = settings.wordpress.url;
@@ -370,13 +378,6 @@ function updateStatusIndicators(settings) {
     llmsrelayStatus.textContent = '✅';
     llmsrelayStatus.style.color = '#86efac';
   }
-  
-  // OpenAI
-  const openaiStatus = document.getElementById('openai-status');
-  if (settings.openai?.apiKey) {
-    openaiStatus.textContent = '✅';
-    openaiStatus.style.color = '#86efac';
-  }
 }
 
 async function saveSettings() {
@@ -397,12 +398,6 @@ async function saveSettings() {
       apiKey: document.getElementById('llmsrelay-key').value,
       baseUrl: document.getElementById('llmsrelay-url').value
     },
-    openai: {
-      apiKey: document.getElementById('openai-key').value
-    },
-    deepseek: {
-      apiKey: document.getElementById('deepseek-key').value
-    },
     wordpress: {
       url: document.getElementById('wordpress-url').value,
       token: document.getElementById('wordpress-token').value
@@ -412,6 +407,8 @@ async function saveSettings() {
       key: document.getElementById('custom-key').value
     }
   };
+  
+  console.log('💾 Saving settings:', JSON.stringify(settings, null, 2));
   
   try {
     const res = await fetch(`${API_URL}/settings`, {

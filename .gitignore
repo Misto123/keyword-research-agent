@@ -31,3 +31,8 @@ temp/
 
 # Vercel
 .vercel
+
+# API Credentials - DO NOT COMMIT
+CREDENTIALS.md
+*credentials*
+*CREDENTIALS*
