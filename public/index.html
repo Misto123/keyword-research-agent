@@ -176,6 +176,50 @@
       padding-right: 45px;
     }
 
+    /* Sticky footer for messages */
+    .message-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      background: #1e293b;
+      border-top: 1px solid #2f3336;
+      display: none;
+      z-index: 1000;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .message-footer.show {
+      display: block;
+    }
+
+    .message-footer.success {
+      background: #166534;
+      border-top-color: #22c55e;
+    }
+
+    .message-footer.error {
+      background: #7f1d1d;
+      border-top-color: #ef4444;
+    }
+
+    .message-footer.info {
+      background: #1e3a8a;
+      border-top-color: #3b82f6;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
     .job-item {
       background: #16181c;
       border: 1px solid #2f3336;
@@ -658,8 +702,15 @@
           <button class="btn btn-secondary" onclick="loadSettings()">🔄 Reload Settings</button>
         </div>
 
-        <div id="settings-message" style="margin-top: 15px; padding: 12px; border-radius: 8px; display: none;"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Sticky Footer for Messages -->
+  <div id="message-footer" class="message-footer">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+      <span id="message-text"></span>
+      <button onclick="hideMessage()" style="background: none; border: none; color: #e7e9ea; cursor: pointer; font-size: 20px;">✕</button>
     </div>
   </div>
 

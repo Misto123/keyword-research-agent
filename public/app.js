@@ -334,8 +334,14 @@ async function loadSettings() {
     
     // Helper function to safely set value
     const setIfExists = (id, value) => {
-      const el = document.getElementById(id);
-      if (el && value) el.value = value;
+      try {
+        const el = document.getElementById(id);
+        if (el && value) {
+          el.value = value;
+        }
+      } catch (err) {
+        console.warn(`Could not set value for ${id}:`, err);
+      }
     };
     
     setIfExists('dataforseo-login', settings.dataforseo?.login);
@@ -352,7 +358,7 @@ async function loadSettings() {
     updateStatusIndicators(settings);
   } catch (error) {
     console.error('Failed to load settings:', error);
-    // Don't show error message to user on initial load
+    // Don't show error on initial page load
   }
 }
 
@@ -482,16 +488,26 @@ async function testConnection(provider) {
   }
 }
 
-function showSettingsMessage(message, type) {
-  const msgDiv = document.getElementById('settings-message');
-  msgDiv.textContent = message;
-  msgDiv.style.display = 'block';
-  msgDiv.style.backgroundColor = type === 'success' ? '#166534' : '#7f1d1d';
-  msgDiv.style.color = type === 'success' ? '#86efac' : '#fca5a5';
+function showMessage(message, type = 'info') {
+  const footer = document.getElementById('message-footer');
+  const text = document.getElementById('message-text');
   
+  text.textContent = message;
+  footer.className = `message-footer show ${type}`;
+  
+  // Auto-hide after 5 seconds
   setTimeout(() => {
-    msgDiv.style.display = 'none';
+    hideMessage();
   }, 5000);
+}
+
+function hideMessage() {
+  const footer = document.getElementById('message-footer');
+  footer.className = 'message-footer';
+}
+
+function showSettingsMessage(message, type) {
+  showMessage(message, type);
 }
 
 // Admin Settings Functions
