@@ -332,7 +332,7 @@ async function loadSettings() {
     const res = await fetch(`${API_URL}/settings`);
     const settings = await res.json();
     
-    // Populate form fields (check if element exists first)
+    // Helper function to safely set value
     const setIfExists = (id, value) => {
       const el = document.getElementById(id);
       if (el && value) el.value = value;
@@ -352,7 +352,7 @@ async function loadSettings() {
     updateStatusIndicators(settings);
   } catch (error) {
     console.error('Failed to load settings:', error);
-    // Don't show error to user on page load
+    // Don't show error message to user on initial load
   }
 }
 
