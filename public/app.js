@@ -333,27 +333,26 @@ async function loadSettings() {
     const settings = await res.json();
     
     // Populate form fields (check if element exists first)
-    if (settings.dataforseo?.login && document.getElementById('dataforseo-login')) {
-      document.getElementById('dataforseo-login').value = settings.dataforseo.login;
-    }
-    if (settings.serper?.apiKey && document.getElementById('serper-key')) {
-      document.getElementById('serper-key').value = settings.serper.apiKey;
-    }
-    if (settings.llmsrelay?.apiKey && document.getElementById('llmsrelay-key')) {
-      document.getElementById('llmsrelay-key').value = settings.llmsrelay.apiKey;
-      document.getElementById('llmsrelay-url').value = settings.llmsrelay.baseUrl || 'https://api.llmsrelay.com/v1';
-    }
-    if (settings.wordpress?.url && document.getElementById('wordpress-url')) {
-      document.getElementById('wordpress-url').value = settings.wordpress.url;
-    }
-    if (settings.customApi?.url && document.getElementById('custom-url')) {
-      document.getElementById('custom-url').value = settings.customApi.url;
-    }
+    const setIfExists = (id, value) => {
+      const el = document.getElementById(id);
+      if (el && value) el.value = value;
+    };
+    
+    setIfExists('dataforseo-login', settings.dataforseo?.login);
+    setIfExists('dataforseo-password', settings.dataforseo?.password);
+    setIfExists('serper-key', settings.serper?.apiKey);
+    setIfExists('llmsrelay-key', settings.llmsrelay?.apiKey);
+    setIfExists('llmsrelay-url', settings.llmsrelay?.baseUrl || 'https://api.llmsrelay.com/v1');
+    setIfExists('wordpress-url', settings.wordpress?.url);
+    setIfExists('wordpress-token', settings.wordpress?.token);
+    setIfExists('custom-url', settings.customApi?.url);
+    setIfExists('custom-key', settings.customApi?.key);
     
     // Update status indicators
     updateStatusIndicators(settings);
   } catch (error) {
     console.error('Failed to load settings:', error);
+    // Don't show error to user on page load
   }
 }
 
