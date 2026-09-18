@@ -21,6 +21,29 @@ app.use(express.static(path.join(__dirname, '../public')));
 const jobs = new Map();
 const settingsManager = new SettingsManager();
 
+// API Key Authentication Middleware
+const API_KEY = process.env.API_KEY || 'dev-key-change-in-production';
+
+function authenticateApiKey(req, res, next) {
+  const apiKey = req.headers['x-api-key'] || req.headers['authorization']?.replace('Bearer ', '');
+  
+  // Allow requests without API key in development
+  if (process.env.NODE_ENV !== 'production' && !apiKey) {
+    return next();
+  }
+  
+  if (!apiKey || apiKey !== API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized. Valid API key required.' });
+  }
+  
+  next();
+}
+
+// Apply authentication to API routes (except health check)
+app.use('/api/research', authenticateApiKey);
+app.use('/api/jobs', authenticateApiKey);
+app.use('/api/settings', authenticateApiKey);
+
 /**
  * GET /api/settings - Get current settings (masked)
  */
