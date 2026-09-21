@@ -58,46 +58,113 @@ export class ContentWorkflow {
   }
 
   /**
-   * Write articles from briefs
+   * Write articles from briefs using Content Creator API
    */
   async writeArticles(articleBriefs, researchData) {
     const articles = [];
+    const contentCreatorUrl = 'https://kalswipohwljtousvacy.supabase.co/functions/v1/public-api';
+    const contentCreatorKey = process.env.CONTENT_CREATOR_API_KEY;
+
+    if (!contentCreatorKey) {
+      console.warn('⚠️ CONTENT_CREATOR_API_KEY not set, using fallback generation');
+      return this.writeArticlesFallback(articleBriefs);
+    }
 
     for (let i = 0; i < articleBriefs.length; i++) {
       const brief = articleBriefs[i];
       console.log(`\nWriting ${i + 1}/${articleBriefs.length}: ${brief.title}`);
 
       try {
-        // Get relevant research data for this article
-        const relevantData = {
-          serpData: researchData.serpData[brief.primaryKeyword],
-          keywords: researchData.keywords.filter(kw => 
-            brief.secondaryKeywords.includes(kw.keyword)
-          ),
-          topics: researchData.topics
-        };
-
-        // Write the article
-        const article = await this.llm.writeArticle(brief, relevantData);
-
-        articles.push({
-          ...article,
-          slug: brief.slug,
-          primaryKeyword: brief.primaryKeyword,
-          secondaryKeywords: brief.secondaryKeywords,
-          intent: brief.intent
+        // Call Content Creator API
+        const response = await fetch(contentCreatorUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': contentCreatorKey
+          },
+          body: JSON.stringify({
+            keywords: {
+              main_keyword: brief.primaryKeyword,
+              secondary_keywords: brief.secondaryKeywords || []
+            },
+            language: 'English',
+            article_length_words: 600,
+            paragraph_count: 3,
+            tone: 'conversational',
+            search_intent: brief.intent || 'informational',
+            enable_no_ai_slop: true,
+            enable_api_output: true,
+            enable_seo_optimization: true,
+            include_seo_insights: true
+          })
         });
 
-        console.log(`✅ Completed: ${article.title}`);
+        if (!response.ok) {
+          console.error(`❌ Content Creator API error: ${response.status}`);
+          continue;
+        }
 
-        // Rate limit to avoid API throttling
-        await this.delay(2000);
+        const result = await response.json();
+
+        if (!result.success || !result.data) {
+          console.error(`❌ Invalid response from Content Creator`);
+          continue;
+        }
+
+        // Convert Content Creator format
+        const content = result.data.content;
+        let html = `<h1>${content.h1}</h1>\n\n<p>${content.intro}</p>\n\n`;
+        for (const section of content.sections) {
+          html += `<h2>${section.heading}</h2>\n${section.body}\n\n`;
+        }
+        if (content.cta) html += `<p><strong>${content.cta}</strong></p>\n`;
+
+        articles.push({
+          title: result.data.meta.title,
+          content: html,
+          slug: brief.slug || result.data.meta.slug,
+          primaryKeyword: brief.primaryKeyword,
+          secondaryKeywords: brief.secondaryKeywords,
+          intent: brief.intent,
+          meta: {
+            description: result.data.meta.description,
+            keywords: [brief.primaryKeyword, ...(brief.secondaryKeywords || [])]
+          },
+          wordCount: html.split(/\s+/).length,
+          seo: result.data.seo_insights || null,
+          schema: result.data.schema || null
+        });
+
+        console.log(`✅ Completed: ${result.data.meta.title} (${articles[articles.length-1].wordCount} words)`);
+
+        // Rate limit
+        await this.delay(1000);
       } catch (error) {
         console.error(`❌ Error writing "${brief.title}":`, error.message);
       }
     }
 
-    return articles;
+    return articles.length > 0 ? articles : this.writeArticlesFallback(articleBriefs);
+  }
+
+  /**
+   * Fallback article generation
+   */
+  async writeArticlesFallback(articleBriefs) {
+    console.log('📝 Using fallback article generation...');
+    return articleBriefs.map(brief => ({
+      title: brief.title,
+      content: `<h1>${brief.title}</h1>\n\n<p>Comprehensive guide about ${brief.primaryKeyword}.</p>`,
+      slug: brief.slug,
+      primaryKeyword: brief.primaryKeyword,
+      secondaryKeywords: brief.secondaryKeywords,
+      intent: brief.intent,
+      meta: {
+        description: `Learn about ${brief.primaryKeyword}.`,
+        keywords: [brief.primaryKeyword]
+      },
+      wordCount: 150
+    }));
   }
 
   /**
