@@ -326,210 +326,6 @@ function togglePassword(fieldId) {
 }
 
 // Settings Management Functions
-
-async function loadSettings() {
-  try {
-    const res = await fetch(`${API_URL}/settings`);
-    const settings = await res.json();
-    
-    // Helper function to safely set value
-    const setIfExists = (id, value) => {
-      try {
-        const el = document.getElementById(id);
-        if (el && value) {
-          el.value = value;
-        }
-      } catch (err) {
-        console.warn(`Could not set value for ${id}:`, err);
-      }
-    };
-    
-    setIfExists('dataforseo-login', settings.dataforseo?.login);
-    setIfExists('dataforseo-password', settings.dataforseo?.password);
-    setIfExists('serper-key', settings.serper?.apiKey);
-    setIfExists('llmsrelay-key', settings.llmsrelay?.apiKey);
-    setIfExists('llmsrelay-url', settings.llmsrelay?.baseUrl || 'https://api.llmsrelay.com/v1');
-    setIfExists('wordpress-url', settings.wordpress?.url);
-    setIfExists('wordpress-token', settings.wordpress?.token);
-    setIfExists('custom-url', settings.customApi?.url);
-    setIfExists('custom-key', settings.customApi?.key);
-    
-    // Update status indicators
-    updateStatusIndicators(settings);
-  } catch (error) {
-    console.error('Failed to load settings:', error);
-    // Don't show error on initial page load
-  }
-}
-
-function updateStatusIndicators(settings) {
-  // DataForSEO
-  const dfStatus = document.getElementById('dataforseo-status');
-  if (dfStatus) {
-    if (settings.dataforseo?.login && settings.dataforseo?.password) {
-      dfStatus.textContent = '✅';
-      dfStatus.style.color = '#10b981';
-    } else {
-      dfStatus.textContent = '⚠️';
-      dfStatus.style.color = '#f59e0b';
-    }
-  }
-  
-  // Serper
-  const serperStatus = document.getElementById('serper-status');
-  if (serperStatus) {
-    if (settings.serper?.apiKey) {
-      serperStatus.textContent = '✅';
-      serperStatus.style.color = '#10b981';
-    } else {
-      serperStatus.textContent = '⚠️';
-      serperStatus.style.color = '#f59e0b';
-    }
-  }
-  
-  // llmsrelay
-  const llmsrelayStatus = document.getElementById('llmsrelay-status');
-  if (llmsrelayStatus) {
-    if (settings.llmsrelay?.apiKey) {
-      llmsrelayStatus.textContent = '✅';
-      llmsrelayStatus.style.color = '#10b981';
-    } else {
-      llmsrelayStatus.textContent = '⚠️';
-      llmsrelayStatus.style.color = '#f59e0b';
-    }
-  }
-}
-
-async function saveSettings() {
-  const btn = event.target;
-  const originalText = btn.textContent;
-  btn.textContent = 'Saving...';
-  btn.disabled = true;
-  
-  const settings = {
-    dataforseo: {
-      login: document.getElementById('dataforseo-login').value,
-      password: document.getElementById('dataforseo-password').value
-    },
-    serper: {
-      apiKey: document.getElementById('serper-key').value
-    },
-    llmsrelay: {
-      apiKey: document.getElementById('llmsrelay-key').value,
-      baseUrl: document.getElementById('llmsrelay-url').value
-    },
-    wordpress: {
-      url: document.getElementById('wordpress-url')?.value || '',
-      token: document.getElementById('wordpress-token')?.value || ''
-    },
-    customApi: {
-      url: document.getElementById('custom-url')?.value || '',
-      key: document.getElementById('custom-key')?.value || ''
-    }
-  };
-  
-  console.log('💾 Saving settings:', JSON.stringify(settings, null, 2));
-  
-  try {
-    const res = await fetch(`${API_URL}/settings`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settings)
-    });
-    
-    const result = await res.json();
-    
-    if (res.ok) {
-      showMessage('✅ Settings saved successfully!', 'success');
-      updateStatusIndicators(settings);
-    } else {
-      showMessage(`❌ Error: ${result.error}`, 'error');
-    }
-  } catch (error) {
-    showMessage(`❌ Error: ${error.message}`, 'error');
-  } finally {
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
-}
-
-async function testConnection(provider) {
-  const btn = event.target;
-  const originalText = btn.textContent;
-  btn.textContent = '⏳ Testing...';
-  btn.disabled = true;
-  
-  let credentials = {};
-  
-  switch (provider) {
-    case 'dataforseo':
-      credentials = {
-        login: document.getElementById('dataforseo-login').value,
-        password: document.getElementById('dataforseo-password').value
-      };
-      break;
-    case 'serper':
-      credentials = {
-        apiKey: document.getElementById('serper-key').value
-      };
-      break;
-    case 'llmsrelay':
-      credentials = {
-        apiKey: document.getElementById('llmsrelay-key').value,
-        baseUrl: document.getElementById('llmsrelay-url').value
-      };
-      break;
-  }
-  
-  try {
-    const res = await fetch(`${API_URL}/settings/test`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider, credentials })
-    });
-    
-    const result = await res.json();
-    
-    if (result.success) {
-      showSettingsMessage(`✅ ${provider}: ${result.message}`, 'success');
-    } else {
-      showSettingsMessage(`❌ ${provider}: ${result.message}`, 'error');
-    }
-  } catch (error) {
-    showSettingsMessage(`❌ ${provider}: ${error.message}`, 'error');
-  } finally {
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
-}
-
-function showMessage(message, type = 'info') {
-  const footer = document.getElementById('message-footer');
-  const text = document.getElementById('message-text');
-  
-  text.textContent = message;
-  footer.className = `message-footer show ${type}`;
-  
-  // Auto-hide after 5 seconds
-  setTimeout(() => {
-    hideMessage();
-  }, 5000);
-}
-
-function hideMessage() {
-  const footer = document.getElementById('message-footer');
-  footer.className = 'message-footer';
-}
-
-function showSettingsMessage(message, type) {
-  showMessage(message, type);
-}
-
-// Admin Settings Functions
-
-/**
- * Load settings from server
- */
 async function loadSettings() {
   try {
     const res = await fetch(`${API_URL}/settings`);
@@ -547,12 +343,6 @@ async function loadSettings() {
     if (settings.serper) {
       document.getElementById('serper-key').value = settings.serper.apiKey || '';
     }
-    if (settings.openai) {
-      document.getElementById('openai-key').value = settings.openai.apiKey || '';
-    }
-    if (settings.deepseek) {
-      document.getElementById('deepseek-key').value = settings.deepseek.apiKey || '';
-    }
     if (settings.wordpress) {
       document.getElementById('wordpress-url').value = settings.wordpress.url || '';
       document.getElementById('wordpress-token').value = settings.wordpress.token || '';
@@ -562,15 +352,47 @@ async function loadSettings() {
       document.getElementById('custom-key').value = settings.customApi.key || '';
     }
     
-    showSettingsMessage('Settings loaded', 'success');
+    updateStatusIndicators(settings);
   } catch (error) {
-    showSettingsMessage(`Error loading settings: ${error.message}`, 'error');
+    console.error('Failed to load settings:', error);
   }
 }
 
-/**
- * Save all settings to server
- */
+function updateStatusIndicators(settings) {
+  const dfStatus = document.getElementById('dataforseo-status');
+  if (dfStatus) {
+    if (settings.dataforseo?.login && settings.dataforseo?.password) {
+      dfStatus.textContent = '✅';
+      dfStatus.style.color = '#10b981';
+    } else {
+      dfStatus.textContent = '⚠️';
+      dfStatus.style.color = '#f59e0b';
+    }
+  }
+  
+  const serperStatus = document.getElementById('serper-status');
+  if (serperStatus) {
+    if (settings.serper?.apiKey) {
+      serperStatus.textContent = '✅';
+      serperStatus.style.color = '#10b981';
+    } else {
+      serperStatus.textContent = '⚠️';
+      serperStatus.style.color = '#f59e0b';
+    }
+  }
+  
+  const llmsrelayStatus = document.getElementById('llmsrelay-status');
+  if (llmsrelayStatus) {
+    if (settings.llmsrelay?.apiKey) {
+      llmsrelayStatus.textContent = '✅';
+      llmsrelayStatus.style.color = '#10b981';
+    } else {
+      llmsrelayStatus.textContent = '⚠️';
+      llmsrelayStatus.style.color = '#f59e0b';
+    }
+  }
+}
+
 async function saveSettings() {
   const settings = {
     llmsrelay: {
@@ -583,12 +405,6 @@ async function saveSettings() {
     },
     serper: {
       apiKey: document.getElementById('serper-key').value
-    },
-    openai: {
-      apiKey: document.getElementById('openai-key').value
-    },
-    deepseek: {
-      apiKey: document.getElementById('deepseek-key').value
     },
     wordpress: {
       url: document.getElementById('wordpress-url').value,
@@ -610,18 +426,16 @@ async function saveSettings() {
     const result = await res.json();
     
     if (res.ok) {
-      showSettingsMessage('✅ Settings saved successfully!', 'success');
+      showMessage('✅ Settings saved successfully!', 'success');
+      updateStatusIndicators(settings);
     } else {
-      showSettingsMessage(`❌ Error: ${result.error}`, 'error');
+      showMessage(`❌ Error: ${result.error}`, 'error');
     }
   } catch (error) {
-    showSettingsMessage(`❌ Error saving settings: ${error.message}`, 'error');
+    showMessage(`❌ Error: ${error.message}`, 'error');
   }
 }
 
-/**
- * Test API connection
- */
 async function testConnection(provider) {
   let credentials = {};
   
@@ -646,11 +460,11 @@ async function testConnection(provider) {
   }
   
   if (!credentials || Object.values(credentials).some(v => !v)) {
-    showSettingsMessage('⚠️ Please fill in all required fields', 'error');
+    showMessage('⚠️ Please fill in all required fields', 'error');
     return;
   }
   
-  showSettingsMessage('🔌 Testing connection...', 'info');
+  showMessage('🔌 Testing connection...', 'info');
   
   try {
     const res = await fetch(`${API_URL}/settings/test`, {
@@ -662,38 +476,39 @@ async function testConnection(provider) {
     const result = await res.json();
     
     if (result.success) {
-      showSettingsMessage(`✅ ${provider}: ${result.message}`, 'success');
+      showMessage(`✅ ${provider}: ${result.message}`, 'success');
     } else {
-      showSettingsMessage(`❌ ${provider}: ${result.message}`, 'error');
+      showMessage(`❌ ${provider}: ${result.message}`, 'error');
     }
   } catch (error) {
-    showSettingsMessage(`❌ Error testing ${provider}: ${error.message}`, 'error');
+    showMessage(`❌ Error testing ${provider}: ${error.message}`, 'error');
   }
 }
 
-/**
- * Show settings message
- */
-function showSettingsMessage(message, type) {
-  const messageEl = document.getElementById('settings-message');
-  messageEl.textContent = message;
-  messageEl.style.display = 'block';
+function showMessage(message, type = 'info') {
+  const footer = document.getElementById('message-footer');
+  const text = document.getElementById('message-text');
   
-  if (type === 'success') {
-    messageEl.style.background = '#166534';
-    messageEl.style.color = '#86efac';
-  } else if (type === 'error') {
-    messageEl.style.background = '#7f1d1d';
-    messageEl.style.color = '#fca5a5';
-  } else {
-    messageEl.style.background = '#1e3a8a';
-    messageEl.style.color = '#93c5fd';
-  }
+  text.textContent = message;
+  footer.className = `message-footer show ${type}`;
   
   setTimeout(() => {
-    messageEl.style.display = 'none';
+    hideMessage();
   }, 5000);
 }
 
-// Load settings when admin tab is opened
-document.querySelector('.tab[data-tab="admin"]')?.addEventListener('click', loadSettings);
+function hideMessage() {
+  const footer = document.getElementById('message-footer');
+  footer.className = 'message-footer';
+}
+
+// Theme toggle
+function toggleTheme() {
+  document.body.classList.toggle('light-theme');
+  localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+}
+
+// Load theme preference
+if (localStorage.getItem('theme') === 'light') {
+  document.body.classList.add('light-theme');
+}

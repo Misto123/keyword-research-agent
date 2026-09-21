@@ -16,6 +16,156 @@
       background: #0f1419;
       color: #e7e9ea;
       line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light-theme {
+      background: #ffffff;
+      color: #1f2937;
+    }
+
+    body.light-theme .container {
+      color: #1f2937;
+    }
+
+    body.light-theme header {
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    body.light-theme h1 {
+      color: #1d9bf0;
+    }
+
+    body.light-theme .subtitle {
+      color: #6b7280;
+    }
+
+    body.light-theme .tabs {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    body.light-theme .tab {
+      color: #6b7280;
+    }
+
+    body.light-theme .tab:hover {
+      color: #1f2937;
+    }
+
+    body.light-theme .tab.active {
+      color: #1d9bf0;
+    }
+
+    body.light-theme .card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    body.light-theme label {
+      color: #1f2937;
+    }
+
+    body.light-theme input,
+    body.light-theme select,
+    body.light-theme textarea {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      color: #1f2937;
+    }
+
+    body.light-theme input:focus,
+    body.light-theme select:focus,
+    body.light-theme textarea:focus {
+      border-color: #1d9bf0;
+    }
+
+    body.light-theme .btn-secondary {
+      background: #f9fafb;
+      color: #1f2937;
+      border: 1px solid #d1d5db;
+    }
+
+    body.light-theme .btn-secondary:hover {
+      background: #f3f4f6;
+    }
+
+    body.light-theme .password-toggle {
+      color: #6b7280;
+    }
+
+    body.light-theme .password-toggle:hover {
+      color: #1d9bf0;
+    }
+
+    body.light-theme .job-item {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    body.light-theme .job-item:hover {
+      background: #f3f4f6;
+      border-color: #1d9bf0;
+    }
+
+    body.light-theme .job-title {
+      color: #1f2937;
+    }
+
+    body.light-theme .job-meta {
+      color: #6b7280;
+    }
+
+    body.light-theme .progress-bar {
+      background: #e5e7eb;
+    }
+
+    body.light-theme .stat-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    body.light-theme .stat-label {
+      color: #6b7280;
+    }
+
+    body.light-theme .article-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    body.light-theme .article-title {
+      color: #1f2937;
+    }
+
+    body.light-theme .empty-state {
+      color: #6b7280;
+    }
+
+    body.light-theme .modal {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    body.light-theme .modal-content {
+      background: #ffffff;
+      color: #1f2937;
+    }
+
+    body.light-theme .close-btn {
+      color: #6b7280;
+    }
+
+    body.light-theme .close-btn:hover {
+      background: #f3f4f6;
+    }
+
+    body.light-theme .loading {
+      color: #6b7280;
+    }
+
+    body.light-theme .spinner {
+      border: 3px solid #e5e7eb;
+      border-top-color: #1d9bf0;
     }
 
     .container {
@@ -482,9 +632,42 @@
         grid-template-columns: 1fr;
       }
     }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #16181c;
+      border: 1px solid #2f3336;
+      color: #e7e9ea;
+      padding: 10px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 16px;
+      z-index: 100;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background: #1c1f23;
+      border-color: #1d9bf0;
+    }
+
+    body.light-theme .theme-toggle {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      color: #1f2937;
+    }
+
+    body.light-theme .theme-toggle:hover {
+      background: #f3f4f6;
+      border-color: #1d9bf0;
+    }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+  
   <header>
     <div class="container">
       <h1>🔬 Keyword Research Agent</h1>

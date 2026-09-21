@@ -320,7 +320,6 @@ async function runResearch(jobId, researchConfig) {
     });
   }
 }
-}
 
 // Health check
 app.get('/api/health', (req, res) => {
