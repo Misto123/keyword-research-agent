@@ -177,19 +177,31 @@ app.post('/api/research', async (req, res) => {
  * GET /api/jobs/:id - Get job status
  */
 app.get('/api/jobs/:id', (req, res) => {
-  const job = jobs.get(req.params.id);
-  if (!job) return res.status(404).json({ error: 'Job not found' });
-  res.json(job);
+  try {
+    const job = jobs.get(req.params.id);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+    res.json(job);
+  } catch (error) {
+    console.error('Error fetching job:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 /**
  * GET /api/jobs - List all jobs
  */
 app.get('/api/jobs', (req, res) => {
-  const allJobs = Array.from(jobs.values()).sort((a, b) => 
-    new Date(b.createdAt) - new Date(a.createdAt)
-  );
-  res.json(allJobs);
+  try {
+    const allJobs = Array.from(jobs.values()).sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    res.json(allJobs);
+  } catch (error) {
+    console.error('Error listing jobs:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 /**
