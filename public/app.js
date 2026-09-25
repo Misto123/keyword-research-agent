@@ -37,7 +37,7 @@ document.getElementById('research-form').addEventListener('submit', async (e) =>
         country: document.getElementById('country').value,
         language: document.getElementById('language').value,
         depth: document.getElementById('depth').value,
-        autoPublish: document.getElementById('autoPublish').checked
+        autoPublish: document.getElementById('autoPublish')?.checked || false
       })
     });
     
